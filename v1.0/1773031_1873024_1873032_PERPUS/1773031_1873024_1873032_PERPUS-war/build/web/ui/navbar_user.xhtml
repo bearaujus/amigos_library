@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+    <ui:composition> 
+        <h:outputStylesheet name="primeicons/primeicons.css" library="primefaces" />
+        <link rel="stylesheet" href="assets/styles.css"/>
+        <p:menubar autoDisplay="false">
+            <p:menuitem>
+                <a>
+                    <h:graphicImage value="assets/main_wcaption_horizontal_small.png" height="55" style="margin-top: 0px !important; margin-bottom: 0px !important;"/>
+                </a>
+            </p:menuitem>
+            <p:menuitem value="&nbsp;PEMINJAMAN" class="itemmenu" icon="pi pi-bookmark" style="margin-left: 70px !important" action="#{globalBean.redirect_user_home()}" update="@form" immediate="true" async="true" resetValues="true"/>
+            <p:menuitem value="&nbsp;HISTORY PEMINJAMAN" class="itemmenu" icon="pi pi-folder-open" action="#{globalBean.redirect_user_history_peminjaman()}" update="@form" immediate="true" async="true" resetValues="true"/>
+            <p:menuitem value="&nbsp;PROFILE" class="itemmenu" icon="pi pi-user" action="#{globalBean.redirect_user_profile()}" update="@form" immediate="true" async="true" resetValues="true"/>
+            <p:menuitem value="&nbsp;LOGOUT" class="itemmenu" icon="pi pi-sign-out" action="#{globalBean.redirect_user_logout()}" update="@form messages" immediate="true" async="true" resetValues="true">
+                <p:confirm header="CONFIRMATION" message="Are you sure ?" icon="pi pi-info-circle"/>
+            </p:menuitem>
+        </p:menubar>
+    </ui:composition>
+</html>
