@@ -1,0 +1,1173 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:pe="http://primefaces.org/ui/extensions">
+    <h:head>
+        <link rel="icon" type="image/icon" href="assets/main.png"/> 
+        <link rel="stylesheet" href="assets/styles.css"/>
+        <meta charset = "utf-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <title>UAS - Perpustakaan</title>
+        <h:outputStylesheet name="primeicons/primeicons.css" library="primefaces"/>
+    </h:head>
+    <h:body onload="#{globalBean.init()}">
+        <p:growl id="messages" showDetail="true" life="2100"/>
+        <h:form id="form_global">
+            <p:panel rendered="#{globalBean.ejbAdminPerpus.loggedUser != null}">
+                <ui:insert name = "header" >
+                    <ui:include src = "ui/navbar_admin.xhtml" />
+                </ui:insert>
+            </p:panel>
+
+            <p:panel rendered="#{globalBean.ejbAnggota.loggedUser != null}">
+                <ui:insert name = "header" >
+                    <ui:include src = "ui/navbar_user.xhtml" />
+                </ui:insert>
+            </p:panel>
+
+            <p:commandButton action="#{globalBean.injectData()}" icon="pi pi-chevron-circle-right" rendered="#{globalBean.indexer == 'login'}" update="@form messages" class="diff-action-button-icon" style="position: absolute; right: 5px; bottom: 5px; height: 30px !important" immediate="true" async="true" resetValues="true"/>
+            <p:panel rendered="#{globalBean.indexer == 'login'}" class="ui-panel-login">
+                <br/><br/>
+                <div style="text-align: center">
+                    <p:graphicImage value="assets/main_wcaption.png" alt="err" class="index-logo"/>
+                </div><br/><br/>
+                <p:fieldset style="width: 70%; margin-left: auto; margin-right: auto">
+                    <p:selectOneRadio value="#{globalBean.selector}" style="margin-left: auto; margin-right: auto">
+                        <f:selectItem itemLabel="Login Sebagai Anggota" itemValue="user"/>
+                        <f:selectItem itemLabel="Login Sebagai Admin" itemValue="admin"/>
+                        <p:ajax event="change" listener="#{globalBean.resetUser()}" update="@form" process="@this" resetValues="true"/>
+                    </p:selectOneRadio><br/>
+                    <span class="ui-float-label">
+                        <p:inputText value="#{globalBean.anggota.username}" style="width: 98%" required="true" requiredMessage="Username Required"/>
+                        <p:outputLabel for="@previous" value="Username"/>
+                    </span><br/>
+                    <span class="ui-float-label">
+                        <p:password value="#{globalBean.anggota.password}" style="width: 98%" maxlength="12" required="true" requiredMessage="Password Required"/>
+                        <p:outputLabel for="@previous" value="Password"/>
+                    </span><br/>
+                    <p:commandButton action="#{globalBean.login()}" value="LOGIN" update="@form messages" style="width: 100%"/><br/><br/>
+                    <div style="text-align: center">
+                        <p:commandLink action="#{globalBean.redirect_register()}" value="Create New Account" update="@form" immediate="true" async="true" resetValues="true" style="top: 50px"/>
+                        <p:outputLabel value="|" class="ui-commandlink" style="margin-right: 10px; margin-left: 10px"/>
+                        <p:commandLink action="#{globalBean.redirect_forgotPassword()}" value="Forgot Password" update="@form" immediate="true" async="true" resetValues="true" style="top: 50px"/>
+                    </div>
+                </p:fieldset>
+                <br/><br/>
+            </p:panel>
+
+            <p:panel rendered="#{globalBean.indexer == 'register'}" class="ui-panel-register" style="margin-top: 40px">
+                <div style="text-align: center">
+                    <p:graphicImage value="assets/main_wcaption.png" alt="err" class="index-logo"/>
+                </div>
+            </p:panel>
+
+            <p:panel rendered="#{(globalBean.indexer == 'register') and (globalBean.selector == 'user')}" class="ui-panel-register">
+                <br/>
+                <p:fieldset style="width: 70%; margin-left: auto; margin-right: auto">
+                    <p:selectOneRadio value="#{globalBean.selector}" style="margin-left: auto; margin-right: auto">
+                        <f:selectItem itemLabel="Register Sebagai Anggota" itemValue="user"/>
+                        <f:selectItem itemLabel="Register Sebagai Admin" itemValue="admin"/>
+                        <p:ajax event="change" listener="#{globalBean.resetUser()}" update="@form" process="@this" resetValues="true"/>
+                    </p:selectOneRadio><br/>
+                    <span class="ui-float-label">
+                        <p:inputText value="#{globalBean.anggota.nama}" style="width: 98%" required="true" requiredMessage="Nama Lengkap Required"/>
+                        <p:outputLabel for="@previous" value="Nama Lengkap"/>
+                    </span><br/>
+                    <span class="ui-float-label">
+                        <p:datePicker value="#{globalBean.anggota.tanggalLahir}" monthNavigator="true" yearNavigator="true" yearRange="1960:2021" required="true" requiredMessage="Tanggal Lahir Required"/>
+                        <p:outputLabel for="@previous" value="Tanggal Lahir"/>
+                    </span><br/>
+                    <span class="ui-float-label" >
+                        <p:inputText value="#{globalBean.anggota.noHp}" style="width: 98%" required="true" requiredMessage="Nomor HP Required"/>
+                        <p:outputLabel for="@previous" value="Nomor HP"/>
+                    </span><br/>
+                    <span class="ui-float-label">
+                        <p:inputText value="#{globalBean.anggota.username}" style="width: 98%" maxlength="12" required="true" requiredMessage="Username Required"/>
+                        <p:outputLabel for="@previous" value="Username"/>
+                    </span><br/>
+                    <span class="ui-float-label">
+                        <p:password value="#{globalBean.anggota.password}" style="width: 98%" maxlength="12" required="true" requiredMessage="Password Required"/>
+                        <p:outputLabel for="@previous" value="Password"/>
+                    </span><br/>
+                    <span class="ui-float-label">
+                        <p:password value="#{globalBean.confirmPassword}" style="width: 98%" maxlength="12" required="true" requiredMessage="Confirm Password Required"/>
+                        <p:outputLabel for="@previous" value="Confirm Password"/>
+                    </span><br/>
+                    <p:panelGrid rendered="#{globalBean.selector == 'admin'}" columns="2" style="float: right">
+                        <p:outputLabel value="Admin Creation Password"/>
+                        <p:password value="#{globalBean.adminCreationPassword}" style="width: 200px" required="true" requiredMessage="Admin Creation Password Required"/>
+                        <br/>
+                    </p:panelGrid>
+                    <p:commandButton value="REGISTER" action="#{globalBean.register()}" update="@form messages" style="width: 100%"/><br/><br/>
+                    <div style="text-align: center">
+                        <p:commandLink action="#{globalBean.redirect_login()}" value="Already have an account ?" update="@form" immediate="true" async="true" resetValues="true" style="top: 50px"/>
+                    </div>
+                    <br/><br/>
+                </p:fieldset>
+            </p:panel>
+
+            <p:panel rendered="#{(globalBean.indexer == 'register') and (globalBean.selector != 'user')}" class="ui-panel-register">
+                <br/>
+                <p:fieldset style="width: 70%; margin-left: auto; margin-right: auto">
+                    <p:selectOneRadio value="#{globalBean.selector}" style="margin-left: auto; margin-right: auto">
+                        <f:selectItem itemLabel="Register Sebagai Anggota" itemValue="user"/>
+                        <f:selectItem itemLabel="Register Sebagai Admin" itemValue="admin"/>
+                        <p:ajax event="change" listener="#{globalBean.resetUser()}" update="@form" process="@this" resetValues="true"/>
+                    </p:selectOneRadio><br/>
+                    <span class="ui-float-label">
+                        <p:inputText value="#{globalBean.anggota.nama}" style="width: 98%" required="true" requiredMessage="Nama Lengkap Required"/>
+                        <p:outputLabel for="@previous" value="Nama Lengkap"/>
+                    </span><br/>
+                    <span class="ui-float-label">
+                        <p:datePicker value="#{globalBean.anggota.tanggalLahir}" monthNavigator="true" yearNavigator="true" yearRange="1960:2021" required="true" requiredMessage="Tanggal Lahir Required"/>
+                        <p:outputLabel for="@previous" value="Tanggal Lahir"/>
+                    </span><br/>
+                    <span class="ui-float-label">
+                        <p:inputText value="#{globalBean.anggota.username}" style="width: 98%" maxlength="12" required="true" requiredMessage="Username Required"/>
+                        <p:outputLabel for="@previous" value="Username"/>
+                    </span><br/>
+                    <span class="ui-float-label">
+                        <p:password value="#{globalBean.anggota.password}" style="width: 98%" maxlength="12" required="true" requiredMessage="Password Required"/>
+                        <p:outputLabel for="@previous" value="Password"/>
+                    </span><br/>
+                    <span class="ui-float-label">
+                        <p:password value="#{globalBean.confirmPassword}" style="width: 98%" maxlength="12" required="true" requiredMessage="Confirm Password Required"/>
+                        <p:outputLabel for="@previous" value="Confirm Password"/>
+                    </span><br/>
+                    <p:panelGrid rendered="#{globalBean.selector == 'admin'}" columns="2" style="float: right">
+                        <p:outputLabel value="Admin Creation Password"/>
+                        <p:password value="#{globalBean.adminCreationPassword}" style="width: 200px" required="true" requiredMessage="Admin Creation Password Required"/>
+                        <br/>
+                    </p:panelGrid>
+                    <p:commandButton value="REGISTER" action="#{globalBean.register()}" update="@form messages" style="width: 100%"/><br/><br/>
+                    <div style="text-align: center">
+                        <p:commandLink action="#{globalBean.redirect_login()}" value="Already have an account ?" update="@form" immediate="true" async="true" resetValues="true" style="top: 50px"/>
+                    </div>
+                    <br/><br/>
+                </p:fieldset>
+            </p:panel>
+
+            <p:panel rendered="#{globalBean.indexer == 'forgot_password'}" class="ui-panel-login">
+                <br/><br/>
+                <div style="text-align: center">
+                    <p:graphicImage value="assets/main_wcaption.png" alt="err" class="index-logo"/>
+                </div><br/><br/>
+                <p:fieldset style="width: 70%; margin-left: auto; margin-right: auto">
+                    <p:selectOneRadio value="#{globalBean.selector}" style="margin-left: auto; margin-right: auto">
+                        <f:selectItem itemLabel="Lupa Password Anggota" itemValue="user"/>
+                        <f:selectItem itemLabel="Lupa Password Admin" itemValue="admin"/>
+                        <p:ajax event="change" listener="#{globalBean.resetUser()}" update="@form" process="@this" resetValues="true"/>
+                    </p:selectOneRadio><br/>
+                    <span class="ui-float-label">
+                        <p:inputText value="#{globalBean.anggota.username}" style="width: 98%" required="true" requiredMessage="Username Required"/>
+                        <p:outputLabel for="@previous" value="Username"/>
+                    </span><br/>
+                    <span class="ui-float-label">
+                        <p:datePicker value="#{globalBean.anggota.tanggalLahir}" monthNavigator="true" yearNavigator="true" yearRange="1960:2021" required="true" requiredMessage="Birth Date Required"/>
+                        <p:outputLabel for="@previous" value="Tanggal Lahir"/>
+                    </span><br/>
+                    <p:panelGrid rendered="#{globalBean.selector == 'admin'}" columns="2" style="float: right">
+                        <p:outputLabel value="Admin Creation Password"/>
+                        <p:password value="#{globalBean.adminCreationPassword}" style="width: 200px" required="true" requiredMessage="Admin Creation Password Required"/>
+                        <br/>
+                    </p:panelGrid>
+                    <p:commandButton value="SUBMIT" action="#{globalBean.forgotPassword()}" update="@form messages" style="width: 100%"/><br/><br/>
+                    <div style="text-align: center">
+                        <p:commandLink action="#{globalBean.redirect_login()}" value="Already have an account ?" update="@form" immediate="true" async="true" resetValues="true" style="top: 50px"/>     
+                    </div>
+                </p:fieldset>
+                <br/><br/>
+            </p:panel>
+
+            <p:panel rendered="#{globalBean.indexer == 'user_home'}" style="margin-top: 10px">
+                <br/>
+                <table style="width: 100%">
+                    <td style="width: 70%" valign="top">
+                        <p:panelGrid columns="100">
+                            Filter :
+                            <p:inputText value="#{globalBean.filter}">
+                                <p:ajax event="keyup" update="@form"/>
+                            </p:inputText>
+                            <p:commandButton action="#{globalBean.resetFilter()}" style="font-size: 13px; width: 50px; margin-right: 0px" icon="pi pi-refresh" update="@form" immediate="true" resetValues="true" async="true"/>
+                            <p:commandButton action="#{globalBean.setKategoriFilterAll()}" value="All" style="font-size: 10px; width: 50px" disabled="#{globalBean.kategori.nama == ''}" update="@form" immediate="true" async="true"/>
+                            <p:dataGrid value="#{globalBean.ejbKategori.allData}" var="fkat" layout="grid" columns="99" styleClass="ui-datagrid-no-border">
+                                <p:commandButton action="#{globalBean.setKategori(fkat)}" value="#{fkat.nama}" style="font-size: 10px" disabled="#{globalBean.kategori.nama == fkat.nama}" update="@form" immediate="true" async="true"/>
+                            </p:dataGrid>
+                        </p:panelGrid>
+                        <hr width="92.1%" style="float: left; margin-left: 7px"/><br/>
+                        <p:dataGrid value="#{globalBean.dataBukuFiltered}" var="udBuku" styleClass="ui-datagrid-no-border" layout="grid" columns="99" style="text-align: center">
+                            <p:commandLink style="text-decoration: none; margin-left: 5px" action="#{globalBean.showBookDetailsUser(udBuku)}" update="dialog_show_book" process="@this" immediate="true" async="true">
+                                <p:graphicImage value="#{udBuku.gambarLink}" style="height: 250px"/>
+                            </p:commandLink>
+                            <div style="margin-top: 10px; width: 187px">
+                                #{udBuku.jumlahHalaman} pages
+                                <br/>
+                                #{udBuku.ratingFormatted}
+                                <br/>
+                                <p:commandLink action="#{globalBean.setKategori(udBuku.idKategori)}" value="#{udBuku.idKategori.nama}" style="font-size: 10px" disabled="#{globalBean.kategori.nama == udBuku.idKategori.nama}" update="@form" immediate="true" async="true"/>
+                                <br/><br/>
+                            </div>
+                            <br/>
+                        </p:dataGrid>
+                    </td>
+                    <td style="width: 30%; position: fixed; bottom: 39px; right: 0px" valign="top">
+                        <p:panel style="margin-right: 30px; width: 480px; right: 0px">
+                            <h1 style="margin-bottom: 10px">List Peminjaman Aktif</h1>
+                            <div style="font-size: 15px; margin-left: 0px">
+                                Peminjaman Aktif <b>#{globalBean.listActivePeminjaman.size()}</b><br/>
+                            </div>
+                            <hr/>
+                            <p:dataGrid value="#{globalBean.listActivePeminjaman}" var="aPeminjaman" styleClass="ui-datagrid-no-border" layout="grid" columns="99" style="text-align: center">
+                                <p:commandLink disabled="true" style="text-decoration: none; margin-left: 5px" process="@this" immediate="true" async="true" update="@form">
+                                    <p:graphicImage value="#{aPeminjaman.idBuku.gambarLink}" style="height: 180px"/>
+                                </p:commandLink>
+                            </p:dataGrid>
+                            <hr/>
+                            <h1 style="margin-bottom: 10px">Cart Pengajuan Peminjaman Buku</h1>
+                            <div style="font-size: 15px; margin-left: 0px">
+                                Available Peminjaman <b>#{3 - globalBean.listActivePeminjaman.size() - globalBean.cartPeminjaman.size()}</b>
+                                <hr/>
+                                Buku Didalam Cart <b>#{globalBean.cartPeminjaman.size()}</b>
+                            </div>
+                            <hr/>
+                            <p:dataGrid value="#{globalBean.cartPeminjaman}" var="cPeminjaman" styleClass="ui-datagrid-no-border" layout="grid" columns="99" style="text-align: center">
+                                <p:commandLink action="#{globalBean.removeFromCartPeminjamanBuku(cPeminjaman)}" style="text-decoration: none; margin-left: 5px" process="@this" immediate="true" async="true" update="@form">
+                                    <p:graphicImage value="#{cPeminjaman.idBuku.gambarLink}" style="height: 180px"/>
+                                </p:commandLink>
+                            </p:dataGrid>
+                            <hr/>
+                            <p:commandButton rendered="#{globalBean.cartPeminjaman.size() == 0}" value="CART KOSONG" class="diff-action-button" style="width: 100% !important; margin-bottom: 10px; margin-top: 11px" disabled="true"/>
+                            <p:commandButton rendered="#{globalBean.cartPeminjaman.size() != 0}" action="#{globalBean.pinjamBuku()}" value="AJUKAN PEMINJAMAN BUKU" class="diff-action-button" style="width: 100% !important; margin-bottom: 10px; margin-top: 11px" process="@this" immediate="true" async="true" update="@form">
+                                <p:confirm header="CONFIRMATION" message="Are you sure ?" icon="pi pi-info-circle"/>
+                            </p:commandButton>
+                        </p:panel>
+                    </td>
+                </table>
+                <br/><br/>
+            </p:panel>
+
+            <p:panel rendered="#{globalBean.indexer == 'user_history_peminjaman'}" style="margin-top: 10px">
+                <h2>PEMINJAMAN AKTIF</h2>
+                <hr/>
+                <p:dataGrid value="#{globalBean.listActivePeminjaman}" var="aPeminjamanH" styleClass="ui-datagrid-no-border" layout="grid" columns="3">
+                    <table>
+                        <td>
+                            <p:graphicImage value="#{aPeminjamanH.idBuku.gambarLink}" style="height: 150px"/>
+                        </td>
+                        <td>
+                            <p:panelGrid columns="2">
+                                ID Peminjaman
+                                <p:outputLabel value="#{aPeminjamanH.id}" style="font-weight: bold"/>
+                                Tanggal Pengajuan
+                                <p:outputLabel value="#{aPeminjamanH.idPeminjaman.tanggalPengajuanFormatted}" style="font-weight: bold"/>
+                                Tanggal Pengambilan
+                                <p:outputLabel value="#{aPeminjamanH.tanggalPengambilanFormatted}" style="font-weight: bold"/>
+                                Lama Peminjaman
+                                <p:outputLabel value="#{aPeminjamanH.lamaPeminjaman} hari" style="font-weight: bold"/>
+                                Admin Penanggung Jawab
+                                <p:outputLabel value="#{aPeminjamanH.idPeminjaman.idAdminPerpus.nama}" style="font-weight: bold"/>
+                            </p:panelGrid>
+                        </td>
+                    </table>
+                </p:dataGrid>
+                <hr/>
+                *Note : <br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;- Maksimal peminjaman adalah 30 hari setelah tanggal pengambilan. Selebihnya dikenakan denda sebesar Rp 2.500,- /hari.<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;- Pengembalian dengan kondisi rusak, dikenakan total denda sebesar 30% dari total harga buku yang di pinjam.<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;- Pengembalian dengan kondisi hilang, dikenakan total denda sebesar harga buku yang di pinjam.<br/>
+            </p:panel>
+
+            <p:panel rendered="#{globalBean.indexer == 'user_history_peminjaman'}" style="margin-top: 10px">
+                <h2>HISTORY PENGAJUAN PEMINJAMAN</h2>
+                <hr/>
+                <p:dataTable value="#{globalBean.ejbPeminjamanDetails.getListAnggotaPeminjaman(globalBean.ejbAnggota.loggedUser)}" var="hPemDetails">
+                    <p:column style="width: 140px; text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="ID Peminjaman"/>
+                        </f:facet>
+                        <h:outputText value="#{hPemDetails.idPeminjaman.idAliiasFormatted}"/>
+                    </p:column>
+                    <p:column style="width: 140px; text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="Tanggal Pengajuan"/>
+                        </f:facet>
+                        <h:outputText value="#{hPemDetails.idPeminjaman.tanggalPengajuanFormatted}"/>
+                    </p:column>
+                    <p:column style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="Buku"/>
+                        </f:facet>
+                        <br/>
+                        <table>
+                            <td style="border: none !important">
+                                <a href="#{hPemDetails.idBuku.gambarSrc}" target="blank">
+                                    <p:graphicImage alt="invalid url" value="#{hPemDetails.idBuku.gambarLink}" style="width: 150px"/>
+                                </a>
+                            </td>
+                            <td style="border: none !important">
+                                <b><p:link value="#{hPemDetails.idBuku.judul}" target="blank" href="#{hPemDetails.idBuku.gambarSrc}"/></b> (#{hPemDetails.idBuku.tahunTerbitYearOnlyFormatted})
+                                <br/>
+                                <p:outputLabel value="##{hPemDetails.idBuku.idKategori.nama}" style="font-size: 13px"/>
+                                <br/><br/>
+                                by #{hPemDetails.idBuku.pengarang}
+                                <br/>
+                                #{hPemDetails.idBuku.ratingFormatted} | #{hPemDetails.idBuku.jumlahHalaman} pages
+                            </td>
+                        </table>
+                        <br/>
+                    </p:column>
+                    <p:column style="width: 140px; text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="Status Konfirmasi"/>
+                        </f:facet>
+                        <h:outputText value="CONFIRMED" style="color: green" rendered="#{hPemDetails.statusKonfirmasi}"/>
+                        <h:outputText value="NOT CONFIRMED" style="color: red" rendered="#{!hPemDetails.statusKonfirmasi}"/>
+                    </p:column>
+                    <p:column style="width: 140px; text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="Tanggal Pengambilan"/>
+                        </f:facet>
+                        <h:outputText value="#{hPemDetails.tanggalPengambilanFormatted}" rendered="#{hPemDetails.statusKonfirmasi}"/>
+                        <h:outputText value="-" rendered="#{!hPemDetails.statusKonfirmasi}"/>
+                    </p:column>
+                    <p:column style="width: 140px; text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="Status Pengembalian"/>
+                        </f:facet>
+                        <h:outputText value="CONFIRMED" style="color: green" rendered="#{(hPemDetails.tanggalPengembalian != null) and hPemDetails.statusKonfirmasi}"/>
+                        <h:outputText value="NOT CONFIRMED" style="color: red" rendered="#{(hPemDetails.tanggalPengembalian == null) and hPemDetails.statusKonfirmasi}"/>
+                        <h:outputText value="-" rendered="#{!hPemDetails.statusKonfirmasi}"/>
+                    </p:column>
+                    <p:column style="width: 140px; text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="Tanggal Pengembalian"/>
+                        </f:facet>
+                        <h:outputText value="#{hPemDetails.tanggalPengembalianFormatted}" rendered="#{hPemDetails.tanggalPengembalian != null}"/>
+                        <h:outputText value="-" rendered="#{hPemDetails.tanggalPengembalian == null}"/>
+                    </p:column>
+                    <p:column style="width: 140px; text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="Lama Peminjaman"/>
+                        </f:facet>
+                        <h:outputText value="#{hPemDetails.lamaPeminjaman} hari" rendered="#{hPemDetails.lamaPeminjaman != null}"/>
+                        <h:outputText value="-" rendered="#{hPemDetails.lamaPeminjaman == null}"/>
+                    </p:column>
+                    <p:column style="width: 140px; text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="Denda"/>
+                        </f:facet>
+                        <p:panelGrid columns="1" rendered="#{hPemDetails.idDenda != null}">
+                            <h:outputText value="#{hPemDetails.idDenda.totalDendaFormatted}"/>
+                            <p:commandLink action="#{globalBean.viewDenda(hPemDetails.idDenda)}" value="View Details" style="font-size: 13px" process="@this" immediate="true" async="true"/>
+                        </p:panelGrid>
+                        <h:outputText value="-" rendered="#{hPemDetails.idDenda == null}"/>
+                    </p:column>
+                </p:dataTable>
+                <br/><br/>
+            </p:panel>
+
+            <p:panel rendered="#{globalBean.indexer == 'user_profile'}" style="margin-top: 10px">
+                <h2>PROFILE</h2>
+            </p:panel>
+
+            <p:panel rendered="#{globalBean.indexer == 'user_profile'}" style="margin-top: 10px">
+                <br/>
+                <p:fieldset legend="DETAILS">
+                    <br/>
+                    <p:panelGrid columns="2">
+                        <p:outputLabel value="Member Since"/>
+                        <p:outputLabel value=": #{globalBean.ejbAnggota.loggedUser.tanggalBergabungFormatted}"/>
+                        <p:outputLabel value="ID"/>
+                        <p:outputLabel value=": #{globalBean.ejbAnggota.loggedUser.idAliiasFormatted}"/>
+                        <p:outputLabel value="Nama"/>
+                        <p:outputLabel value=": #{globalBean.ejbAnggota.loggedUser.nama}"/>
+                        <p:outputLabel value="Kontak"/>
+                        <p:outputLabel value=": #{globalBean.ejbAnggota.loggedUser.noHp}"/>
+                        <p:outputLabel value="Username"/>
+                        <p:outputLabel value=": #{globalBean.ejbAnggota.loggedUser.username}"/>
+                        <p:outputLabel value="Password"/>
+                        <p:outputLabel value=": #{globalBean.ejbAnggota.loggedUser.passwordEncrypted}"/>
+                    </p:panelGrid>
+                </p:fieldset>
+                <br/>
+                <p:fieldset legend="CHANGE PASSWORD">
+                    <br/>
+                    <p:panelGrid columns="2">
+                        <p:outputLabel value="New Password"/>
+                        <p:password value="#{globalBean.adminPerpus.password}" style="width: 98%" maxlength="12" required="true" requiredMessage="New Password Required"/>
+                        <p:outputLabel value="Confirm New Password"/>
+                        <p:password value="#{globalBean.confirmPassword}" style="width: 98%" maxlength="12" required="true" requiredMessage="Confirm New Password Required"/>
+                        <p:outputLabel/>
+                        <p:commandButton value="SAVE" action="#{globalBean.changePasswordAnggota()}" update="@form messages" icon="pi pi-save" class="diff-action-button" style="width: 102% !important">
+                            <p:confirm header="CONFIRMATION" message="Are you sure ?" icon="pi pi-info-circle"/>
+                        </p:commandButton>
+                    </p:panelGrid>
+                </p:fieldset>
+                <br/><br/>
+            </p:panel>
+
+            <p:panel rendered="#{globalBean.indexer == 'admin_home'}" style="margin-top: 10px">
+                <h2>SELAMAT DATANG, #{globalBean.adminPerpus.nama.toUpperCase()}</h2>
+            </p:panel>
+
+            <p:panel rendered="#{globalBean.indexer == 'admin_home'}" style="margin-top: 10px">
+                <br/>
+                <p:fieldset legend="MASTER DATA">
+                    <br/>
+                    <p:panelGrid columns="2">
+                        Total Anggota
+                        <p:outputLabel value="#{globalBean.ejbAnggota.allData.size()}"/>
+                        Total Admin
+                        <p:outputLabel value="#{globalBean.ejbAdminPerpus.allData.size()}"/>
+                        Total Kategori Buku
+                        <p:outputLabel value="#{globalBean.ejbKategori.allData.size()}"/>
+                        Total Buku
+                        <p:outputLabel value="#{globalBean.ejbBuku.allData.size()}"/>
+                    </p:panelGrid>
+                </p:fieldset>
+                <br/>
+                <p:fieldset legend="TRANSACTION DATA">
+                    <br/>
+                    <p:panelGrid columns="2">
+                        Total Transaksi 
+                        <p:outputLabel value="#{globalBean.ejbPeminjaman.allData.size()}"/>
+                        Total Transaksi Details
+                        <p:outputLabel value="#{globalBean.ejbPeminjamanDetails.allData.size()}"/>
+                        Total Denda Yang Terjadi
+                        <p:outputLabel value="#{globalBean.ejbDenda.allData.size()}"/>
+                    </p:panelGrid>
+                </p:fieldset>
+                <br/><br/>
+            </p:panel>
+
+            <p:panel rendered="#{globalBean.indexer == 'admin_peminjaman_konfirmasi'}" style="margin-top: 10px">
+                <h2>KONFIRMASI PEMINJAMAN</h2>
+                <hr/>
+                <p:panelGrid columns="4">
+                    Input ID Peminjaman : PMN - 
+                    <p:inputNumber value="#{globalBean.idKonfirmasiPeminjaman}" style="width: 300px" minValue="0" decimalPlaces="0" required="true" requiredMessage="ID Peminjaman Required"/>
+                    <p:commandButton value="SUBMIT" class="diff-action-button" action="#{globalBean.submitIDKonfirmasiPeminjaman()}" update="@form messages" style="width: 300px"/>
+                    <p:commandButton value="REFRESH" class="diff-action-button" action="#{globalBean.redirect_admin_peminjaman_konfirmasi()}" update="@form" immediate="true" async="true" resetValues="true" style="width: 300px"/>
+                </p:panelGrid>
+            </p:panel>
+
+            <p:panel rendered="#{(globalBean.indexer == 'admin_peminjaman_konfirmasi') and (globalBean.peminjaman.id != null)}" style="margin-top: 10px">
+                <br/>
+                <p:panelGrid columns="2">
+                    ID Peminjaman
+                    <p:outputLabel value="#{globalBean.peminjaman.idAliiasFormatted}"/>
+                    ID Anggota
+                    <p:outputLabel value="#{globalBean.peminjaman.idAnggota.idAliiasFormatted}"/>
+                    Nama Anggota
+                    <p:outputLabel value="#{globalBean.peminjaman.idAnggota.nama}"/>
+                    Kontak Anggota
+                    <p:outputLabel value="#{globalBean.peminjaman.idAnggota.noHp}"/>
+                    Anggota Active Peminjaman
+                    <p:outputLabel value="#{globalBean.listActivePeminjaman.size()} (MAX)" rendered="#{globalBean.isActivePeminjamanFull()}"/>
+                    <p:outputLabel value="#{globalBean.listActivePeminjaman.size()}" rendered="#{!globalBean.isActivePeminjamanFull()}"/>
+                    Tanggal Pengajuan
+                    <p:outputLabel value="#{globalBean.peminjaman.tanggalPengajuanFormatted}"/>
+                    Total Buku Yang Diajukan
+                    <p:outputLabel value="#{globalBean.peminjaman.totalBukuYangDiajukan} buku"/>
+                    Penanggung Jawab
+                    <p:outputLabel value="#{globalBean.peminjaman.idAdminPerpus.nama}"/>
+                </p:panelGrid><hr/><br/>
+                <p:dataTable value="#{globalBean.cartPeminjaman}" var="kPeminjamanAdmin">
+                    <p:column style="width: 140px; text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="ID Peminjaman Details"/>
+                        </f:facet>
+                        <h:outputText value="#{kPeminjamanAdmin.idAliiasFormatted}"/>
+                    </p:column>
+                    <p:column style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="Buku"/>
+                        </f:facet>
+                        <br/>
+                        <table>
+                            <td style="border: none !important">
+                                <a href="#{kPeminjamanAdmin.idBuku.gambarSrc}" target="blank">
+                                    <p:graphicImage alt="invalid url" value="#{kPeminjamanAdmin.idBuku.gambarLink}" style="width: 150px"/>
+                                </a>
+                            </td>
+                            <td style="border: none !important">
+                                <b><p:link value="#{kPeminjamanAdmin.idBuku.judul}" target="blank" href="#{kPeminjamanAdmin.idBuku.gambarSrc}"/></b> (#{kPeminjamanAdmin.idBuku.tahunTerbitYearOnlyFormatted})
+                                <br/>
+                                <p:outputLabel value="##{kPeminjamanAdmin.idBuku.idKategori.nama}" style="font-size: 13px"/>
+                                <br/><br/>
+                                <p:panelGrid columns="2" style="text-align: left">
+                                    Sisa Stock
+                                    <p:outputLabel value=": #{kPeminjamanAdmin.idBuku.stok}"/>
+                                    Harga
+                                    <p:outputLabel value=": #{kPeminjamanAdmin.idBuku.hargaFormatted}"/>
+                                </p:panelGrid>
+                            </td>
+                        </table>
+                        <br/>
+                    </p:column>
+                    <p:column style="width: 140px; text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="Status Konfirmasi"/>
+                        </f:facet>
+                        <h:outputText value="CONFIRMED" style="color: green" rendered="#{kPeminjamanAdmin.statusKonfirmasi}"/>
+                        <h:outputText value="NOT CONFIRMED" style="color: red" rendered="#{!kPeminjamanAdmin.statusKonfirmasi}"/>
+                    </p:column>
+                    <p:column style="width: 140px; text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="Tanggal Pengambilan"/>
+                        </f:facet>
+                        <h:outputText value="#{kPeminjamanAdmin.tanggalPengambilanFormatted}" rendered="#{kPeminjamanAdmin.statusKonfirmasi}"/>
+                        <h:outputText value="-" rendered="#{!kPeminjamanAdmin.statusKonfirmasi}"/>
+                    </p:column>
+                    <p:column style="width: 140px; text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="Status Pengembalian"/>
+                        </f:facet>
+                        <h:outputText value="CONFIRMED" style="color: green" rendered="#{(kPeminjamanAdmin.tanggalPengembalian != null) and kPeminjamanAdmin.statusKonfirmasi}"/>
+                        <h:outputText value="NOT CONFIRMED" style="color: red" rendered="#{(kPeminjamanAdmin.tanggalPengembalian == null) and kPeminjamanAdmin.statusKonfirmasi}"/>
+                        <h:outputText value="-" rendered="#{!kPeminjamanAdmin.statusKonfirmasi}"/>
+                    </p:column>
+                    <p:column style="width: 140px; text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="Tanggal Pengembalian"/>
+                        </f:facet>
+                        <h:outputText value="#{kPeminjamanAdmin.tanggalPengembalianFormatted}" rendered="#{kPeminjamanAdmin.tanggalPengembalian != null}"/>
+                        <h:outputText value="-" rendered="#{kPeminjamanAdmin.tanggalPengembalian == null}"/>
+                    </p:column>
+                    <p:column style="width: 140px; text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="Lama Peminjaman"/>
+                        </f:facet>
+                        <h:outputText value="#{kPeminjamanAdmin.lamaPeminjaman} hari" rendered="#{kPeminjamanAdmin.lamaPeminjaman != null}"/>
+                        <h:outputText value="-" rendered="#{kPeminjamanAdmin.lamaPeminjaman == null}"/>
+                    </p:column>
+                    <p:column style="width: 140px; text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="Denda"/>
+                        </f:facet>
+                        <p:panelGrid columns="1" rendered="#{kPeminjamanAdmin.idDenda != null}">
+                            <h:outputText value="#{kPeminjamanAdmin.idDenda.totalDendaFormatted}"/>
+                            <p:commandLink action="#{globalBean.viewDenda(kPeminjamanAdmin.idDenda)}" value="View Details" style="font-size: 13px" process="@this" immediate="true" async="true"/>
+                        </p:panelGrid>
+                        <h:outputText value="-" rendered="#{kPeminjamanAdmin.idDenda == null}"/>
+                    </p:column>
+                    <p:column style="width: 140px; text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="Konfirmasi"/>
+                        </f:facet>
+                        <p:commandButton value="MAX ACTIVE PEMINJAMAN REACHED" rendered="#{globalBean.isActivePeminjamanFull() and !kPeminjamanAdmin.statusKonfirmasi}" disabled="true" class="diff-action-button" style="width: 102% !important; height: auto !important"/>
+                        <p:commandButton value="STOK BUKU KOSONG" rendered="#{(kPeminjamanAdmin.idBuku.stok == 0) and !kPeminjamanAdmin.statusKonfirmasi and !globalBean.isActivePeminjamanFull()}" disabled="true" class="diff-action-button" style="width: 102% !important; height: auto !important"/>
+                        <p:commandButton value="KONFIRMASI PENGAMBILAN" action="#{globalBean.konfirmasiPeminjaman(kPeminjamanAdmin)}" rendered="#{(kPeminjamanAdmin.idBuku.stok != 0) and (kPeminjamanAdmin.tanggalPengambilan == null) and !globalBean.isActivePeminjamanFull()}" update="@form messages" class="diff-action-button" style="width: 102% !important; height: auto !important" process="@this" immediate="true" async="true">
+                            <p:confirm header="CONFIRMATION" message="Apakah anda sudah menyerahkan buku kepada customer ?" icon="pi pi-info-circle"/>
+                        </p:commandButton>
+                        <p:commandButton value="PENGEMBALIAN NORMAL" action="#{globalBean.konfirmasiPengembalian_normal(kPeminjamanAdmin)}" rendered="#{kPeminjamanAdmin.statusKonfirmasi and (kPeminjamanAdmin.tanggalPengembalian == null)}" update="@form messages" class="diff-action-button" style="width: 102% !important; height: auto !important" process="@this" immediate="true" async="true">
+                            <p:confirm header="CONFIRMATION" message="Apakah buku sudah di terima ?" icon="pi pi-info-circle"/>
+                        </p:commandButton>
+                        <p:commandButton value="PENGEMBALIAN RUSAK" action="#{globalBean.konfirmasiPengembalian_rusak(kPeminjamanAdmin)}" rendered="#{kPeminjamanAdmin.statusKonfirmasi and (kPeminjamanAdmin.tanggalPengembalian == null)}" update="@form messages" class="diff-action-button" style="width: 102% !important; height: auto !important; margin-top: 10px" process="@this" immediate="true" async="true">
+                            <p:confirm header="CONFIRMATION" message="Apakah buku sudah di terima dan kondisi buku rusak ?" icon="pi pi-info-circle"/>
+                        </p:commandButton>
+                        <p:commandButton value="PENGEMBALIAN HILANG" action="#{globalBean.konfirmasiPengembalian_hilang(kPeminjamanAdmin)}" rendered="#{kPeminjamanAdmin.statusKonfirmasi and (kPeminjamanAdmin.tanggalPengembalian == null)}" update="@form messages" class="diff-action-button" style="width: 102% !important; height: auto !important; margin-top: 10px" process="@this" immediate="true" async="true">
+                            <p:confirm header="CONFIRMATION" message="Apakah buku hilang ?" icon="pi pi-info-circle"/>
+                        </p:commandButton>
+                        <p:commandButton value="COMPLETED" rendered="#{kPeminjamanAdmin.statusKonfirmasi and (kPeminjamanAdmin.tanggalPengembalian != null)}" disabled="true" class="diff-action-button" style="width: 102% !important; height: auto !important"/>
+                    </p:column>
+                </p:dataTable>
+                <br/><br/>
+            </p:panel>
+
+            <p:panel rendered="#{globalBean.indexer == 'admin_list_peminjaman_aktif'}" style="margin-top: 10px">
+                <h2>LIST PEMINJAMAN AKTIF</h2>
+            </p:panel>
+
+            <p:panel rendered="#{globalBean.indexer == 'admin_list_peminjaman_aktif'}" style="margin-top: 10px">
+                <br/>
+                <p:dataTable value="#{globalBean.ejbPeminjamanDetails.allDataPeminjamanAktif}" var="adpa">
+                    <p:column style="width: 140px; text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="ID Peminjaman"/>
+                        </f:facet>
+                        <h:outputText value="#{adpa.idPeminjaman.idAliiasFormatted}"/>
+                    </p:column>
+                    <p:column style="width: 140px; text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="ID Peminjaman Details"/>
+                        </f:facet>
+                        <h:outputText value="#{adpa.idAliiasFormatted}"/>
+                    </p:column>
+                    <p:column style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="Buku"/>
+                        </f:facet>
+                        <br/>
+                        <table>
+                            <td style="border: none !important">
+                                <a href="#{adpa.idBuku.gambarSrc}" target="blank">
+                                    <p:graphicImage alt="invalid url" value="#{adpa.idBuku.gambarLink}" style="width: 150px"/>
+                                </a>
+                            </td>
+                            <td style="border: none !important">
+                                <b><p:link value="#{adpa.idBuku.judul}" target="blank" href="#{adpa.idBuku.gambarSrc}"/></b> (#{adpa.idBuku.tahunTerbitYearOnlyFormatted})
+                                <br/>
+                                <p:outputLabel value="##{adpa.idBuku.idKategori.nama}" style="font-size: 13px"/>
+                                <br/><br/>
+                                <p:panelGrid columns="2" style="text-align: left">
+                                    Sisa Stock
+                                    <p:outputLabel value=": #{adpa.idBuku.stok}"/>
+                                    Harga
+                                    <p:outputLabel value=": #{adpa.idBuku.hargaFormatted}"/>
+                                </p:panelGrid>
+                            </td>
+                        </table>
+                        <br/>
+                    </p:column>
+                    <p:column style="width: 140px; text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="Tanggal Pengambilan"/>
+                        </f:facet>
+                        <h:outputText value="#{adpa.tanggalPengambilanFormatted}" rendered="#{adpa.statusKonfirmasi}"/>
+                        <h:outputText value="-" rendered="#{!adpa.statusKonfirmasi}"/>
+                    </p:column>
+                    <p:column style="width: 140px; text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="Lama Peminjaman"/>
+                        </f:facet>
+                        <h:outputText value="#{adpa.lamaPeminjaman} hari" rendered="#{adpa.lamaPeminjaman != null}"/>
+                        <h:outputText value="-" rendered="#{adpa.lamaPeminjaman == null}"/>
+                    </p:column>
+                    <p:column style="width: 140px; text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="Nama Peminjam"/>
+                        </f:facet>
+                        <h:outputText value="#{adpa.idPeminjaman.idAnggota.nama}"/>
+                    </p:column>
+                    <p:column style="width: 140px; text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="Kontak Peminjam"/>
+                        </f:facet>
+                        <h:outputText value="#{adpa.idPeminjaman.idAnggota.noHp}"/>
+                    </p:column>
+                    <p:column style="width: 140px; text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="Action"/>
+                        </f:facet>
+                        <p:commandButton value="VIEW" action="#{globalBean.redirect_admin_peminjaman_konfirmasi_pd(adpa)}" update="@form" style="width: 102% !important; height: auto !important" process="@this" immediate="true" async="true"/>
+                    </p:column>
+                </p:dataTable>
+                <br/><br/>
+            </p:panel>
+
+            <p:panel rendered="#{globalBean.indexer == 'admin_history_peminjaman_aktif'}" style="margin-top: 10px">
+                <h2>HISTORY PEMINJAMAN AKTIF</h2>
+            </p:panel>
+
+            <p:panel rendered="#{globalBean.indexer == 'admin_history_peminjaman_aktif'}" style="margin-top: 10px">
+                <br/>
+                <p:dataTable value="#{globalBean.ejbPeminjamanDetails.allDataHistoryPeminjamanAktif}" var="adhpa">
+                    <p:column style="width: 140px; text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="ID Peminjaman"/>
+                        </f:facet>
+                        <h:outputText value="#{adhpa.idPeminjaman.idAliiasFormatted}"/>
+                    </p:column>
+                    <p:column style="width: 140px; text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="ID Peminjaman Details"/>
+                        </f:facet>
+                        <h:outputText value="#{adhpa.idAliiasFormatted}"/>
+                    </p:column>
+                    <p:column style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="Buku"/>
+                        </f:facet>
+                        <br/>
+                        <table>
+                            <td style="border: none !important">
+                                <a href="#{adhpa.idBuku.gambarSrc}" target="blank">
+                                    <p:graphicImage alt="invalid url" value="#{adhpa.idBuku.gambarLink}" style="width: 150px"/>
+                                </a>
+                            </td>
+                            <td style="border: none !important">
+                                <b><p:link value="#{adhpa.idBuku.judul}" target="blank" href="#{adhpa.idBuku.gambarSrc}"/></b> (#{adhpa.idBuku.tahunTerbitYearOnlyFormatted})
+                                <br/>
+                                <p:outputLabel value="##{adhpa.idBuku.idKategori.nama}" style="font-size: 13px"/>
+                                <br/><br/>
+                                <p:panelGrid columns="2" style="text-align: left">
+                                    Sisa Stock
+                                    <p:outputLabel value=": #{adhpa.idBuku.stok}"/>
+                                    Harga
+                                    <p:outputLabel value=": #{adhpa.idBuku.hargaFormatted}"/>
+                                </p:panelGrid>
+                            </td>
+                        </table>
+                        <br/>
+                    </p:column>
+                    <p:column style="width: 140px; text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="Status Konfirmasi"/>
+                        </f:facet>
+                        <h:outputText value="CONFIRMED" style="color: green" rendered="#{adhpa.statusKonfirmasi}"/>
+                        <h:outputText value="NOT CONFIRMED" style="color: red" rendered="#{!adhpa.statusKonfirmasi}"/>
+                    </p:column>
+                    <p:column style="width: 140px; text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="Tanggal Pengambilan"/>
+                        </f:facet>
+                        <h:outputText value="#{adhpa.tanggalPengambilanFormatted}" rendered="#{adhpa.statusKonfirmasi}"/>
+                        <h:outputText value="-" rendered="#{!adhpa.statusKonfirmasi}"/>
+                    </p:column>
+                    <p:column style="width: 140px; text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="Status Pengembalian"/>
+                        </f:facet>
+                        <h:outputText value="CONFIRMED" style="color: green" rendered="#{(adhpa.tanggalPengembalian != null) and adhpa.statusKonfirmasi}"/>
+                        <h:outputText value="NOT CONFIRMED" style="color: red" rendered="#{(adhpa.tanggalPengembalian == null) and adhpa.statusKonfirmasi}"/>
+                        <h:outputText value="-" rendered="#{!adhpa.statusKonfirmasi}"/>
+                    </p:column>
+                    <p:column style="width: 140px; text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="Tanggal Pengembalian"/>
+                        </f:facet>
+                        <h:outputText value="#{adhpa.tanggalPengembalianFormatted}" rendered="#{adhpa.tanggalPengembalian != null}"/>
+                        <h:outputText value="-" rendered="#{adhpa.tanggalPengembalian == null}"/>
+                    </p:column>
+                    <p:column style="width: 140px; text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="Lama Peminjaman"/>
+                        </f:facet>
+                        <h:outputText value="#{adhpa.lamaPeminjaman} hari" rendered="#{adhpa.lamaPeminjaman != null}"/>
+                        <h:outputText value="-" rendered="#{adhpa.lamaPeminjaman == null}"/>
+                    </p:column>
+                    <p:column style="width: 140px; text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="Denda"/>
+                        </f:facet>
+                        <p:panelGrid columns="1" rendered="#{adhpa.idDenda != null}">
+                            <h:outputText value="#{adhpa.idDenda.totalDendaFormatted}"/>
+                            <p:commandLink action="#{globalBean.viewDenda(adhpa.idDenda)}" value="View Details" style="font-size: 13px" process="@this" immediate="true" async="true"/>
+                        </p:panelGrid>
+                        <h:outputText value="-" rendered="#{adhpa.idDenda == null}"/>
+                    </p:column>
+                    <p:column style="width: 140px; text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="Action"/>
+                        </f:facet>
+                        <p:commandButton value="VIEW" action="#{globalBean.redirect_admin_peminjaman_konfirmasi_pd(adhpa)}" update="@form" style="width: 102% !important; height: auto !important" process="@this" immediate="true" async="true"/>
+                    </p:column>
+                </p:dataTable>
+                <br/><br/>
+            </p:panel>
+
+            <p:panel rendered="#{globalBean.indexer == 'admin_data_pengajuan_peminjaman'}" style="margin-top: 10px">
+                <h2>DATA PENGAJUAN PEMINJAMAN</h2>
+            </p:panel>
+
+            <p:panel rendered="#{globalBean.indexer == 'admin_data_pengajuan_peminjaman'}" style="margin-top: 10px">
+                <br/>
+                <p:dataTable value="#{globalBean.ejbPeminjaman.allData}" var="adp">
+                    <p:column style="width: 140px; text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="ID Peminjaman"/>
+                        </f:facet>
+                        <h:outputText value="#{adp.idAliiasFormatted}"/>
+                    </p:column>
+                    <p:column style="width: 140px; text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="Total Buku Yang Diajukan"/>
+                        </f:facet>
+                        <h:outputText value="#{adp.totalBukuYangDiajukan} buku"/>
+                    </p:column>
+                    <p:column style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="Nama Pengaju"/>
+                        </f:facet>
+                        <h:outputText value="#{adp.idAnggota.nama}"/>
+                    </p:column>
+                    <p:column style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="Kontak Pengaju"/>
+                        </f:facet>
+                        <h:outputText value="#{adp.idAnggota.noHp}"/>
+                    </p:column>
+                    <p:column style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="Nama Penanggung Jawab"/>
+                        </f:facet>
+                        <h:outputText value="#{adp.idAdminPerpus.nama}" rendered="#{adp.idAdminPerpus != null}"/>
+                        <h:outputText value="-" rendered="#{adp.idAdminPerpus == null}"/>
+                    </p:column>
+                    <p:column style="width: 140px; text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="Action"/>
+                        </f:facet>
+                        <p:commandButton value="VIEW" action="#{globalBean.redirect_admin_peminjaman_konfirmasi_p(adp)}" update="@form" style="width: 102% !important; height: auto !important" process="@this" immediate="true" async="true"/>
+                    </p:column>
+                </p:dataTable>
+                <br/><br/>
+            </p:panel>
+
+            <p:panel rendered="#{globalBean.indexer == 'admin_master_data_buku'}" style="margin-top: 10px">
+                <h2>MASTER DATA : BUKU</h2>
+            </p:panel>
+
+            <p:panel rendered="#{globalBean.indexer == 'admin_master_data_buku'}" style="margin-top: 10px">
+                <br/>
+                <table>
+                    <td style="width: 30%" valign="top">
+                        <p:fieldset legend="MANAGE DATA">
+                            <br/>
+                            <p:panelGrid columns="2">
+                                <p:outputLabel value="ID"/>
+                                <p:outputLabel value="#{globalBean.buku.id == null ? '! New' : globalBean.buku.idAliiasFormatted}"/>
+                                <p:outputLabel value="Judul"/>
+                                <p:inputTextarea value="#{globalBean.buku.judul}" style="width: 95%; height: 63px" autoResize="false" required="true" requiredMessage="Judul Required"/>
+                                <p:outputLabel value="Pengarang"/>
+                                <p:inputTextarea value="#{globalBean.buku.pengarang}" style="width: 95%; height: 63px" autoResize="false" required="true" requiredMessage="Pengarang Required"/>
+                                <p:outputLabel value="Kategori Buku"/>
+                                <p:selectOneMenu value="#{globalBean.buku.idKategori.id}" style="width: 91%" required="True" requiredMessage="Kategori Buku Required">
+                                    <f:selectItem itemLabel="Pilih Item" itemValue=""/>
+                                    <f:selectItems value="#{globalBean.ejbKategori.selectOneMenuModel}"/>
+                                </p:selectOneMenu>
+                                <p:outputLabel value="Tahun Terbit"/>
+                                <p:datePicker value="#{globalBean.buku.tahunTerbit}" class="form-input" monthNavigator="true" yearNavigator="true" yearRange="1900:2021" required="true" requiredMessage="Tahun Terbit Required"/>
+                                <p:outputLabel value="Jumlah Halaman"/>
+                                <p:inputNumber value="#{globalBean.buku.jumlahHalaman}" class="form-input" minValue="0" decimalPlaces="0" required="true" requiredMessage="Jumlah Halaman Required"/>
+                                <p:outputLabel value="Rating (1-5)"/>
+                                <p:inputNumber value="#{globalBean.buku.rating}" class="form-input" minValue="1" maxValue="5" decimalPlaces="0" required="true" requiredMessage="Rating Required"/>
+                                <p:outputLabel value="Stok"/>
+                                <p:inputNumber value="#{globalBean.buku.stok}" class="form-input" minValue="0" decimalPlaces="0" required="true" requiredMessage="Stok Required"/>
+                                <p:outputLabel value="Harga"/>
+                                <p:inputNumber value="#{globalBean.buku.harga}" class="form-input" minValue="0" decimalPlaces="0" required="true" requiredMessage="Harga Required"/>
+                                <p:outputLabel value="URL Cover"/>
+                                <p:inputTextarea value="#{globalBean.buku.gambarLink}" style="width: 95%; height: 84px" autoResize="false" required="true" requiredMessage="URL Cover Required"/>
+                                <p:outputLabel value="Link Referensi"/>
+                                <p:inputTextarea value="#{globalBean.buku.gambarSrc}" style="width: 95%; height: 84px" autoResize="false" required="true" requiredMessage="Link Referensi Required"/>
+                                <p:outputLabel/>
+                                <h:panelGrid columns="2">
+                                    <p:commandButton value="ADD" action="#{globalBean.masterDataBuku_add()}" update="@form messages" icon="pi pi-save" rendered="#{globalBean.buku.id == null}" class="diff-action-button" style="margin-right: 5px">
+                                        <p:confirm header="CONFIRMATION" message="Are you sure ?" icon="pi pi-info-circle"/>
+                                    </p:commandButton>
+                                    <p:commandButton value="UPDATE" action="#{globalBean.masterDataBuku_update()}" update="@form messages" icon="pi pi-save" rendered="#{globalBean.buku.id != null}" class="diff-action-button" style="margin-right: 5px">
+                                        <p:confirm header="CONFIRMATION" message="Are you sure ?" icon="pi pi-info-circle"/>
+                                    </p:commandButton>
+                                    <p:commandButton value="REFRESH" action="#{globalBean.redirect_admin_master_data_buku()}" update="@form" icon="pi pi-refresh" immediate="true" async="true" resetValues="true" class="diff-action-button"/>
+                                </h:panelGrid>
+                            </p:panelGrid>
+                        </p:fieldset>
+                    </td>
+                    <td style="width: 70%" valign="top">
+                        <p:fieldset legend="ALL DATA">
+                            <p:commandButton value="EXPORT" class="diff-action-button" process="@this" immediate="true" async="true" style="margin-bottom: 10px; float: right">
+                                <p:dataExporter type="pdf" target="tbuku" fileName="data_buku_amigos"/>
+                            </p:commandButton><br/><br/>
+                            <p:dataTable id="tbuku" value="#{globalBean.ejbBuku.allData}" var="mdBuku">
+                                <p:column style="width: 120px; text-align: center">
+                                    <f:facet name="header">
+                                        <h:outputText value="ID"/>
+                                    </f:facet>
+                                    <h:outputText value="#{mdBuku.idAliiasFormatted}"/>
+                                </p:column>
+                                <p:column style="width: 120px">
+                                    <f:facet name="header">
+                                        <h:outputText value="Cover Buku"/>
+                                    </f:facet>
+                                    <a href="#{mdBuku.gambarSrc}" target="blank">
+                                        <p:graphicImage alt="invalid url" value="#{mdBuku.gambarLink}" style="width: 120px"/>
+                                    </a>
+                                </p:column>
+                                <p:column style="text-align: center">
+                                    <f:facet name="header">
+                                        <h:outputText value="Buku"/>
+                                    </f:facet>
+                                    <br/>
+                                    <b><p:link value="#{mdBuku.judul}" target="blank" href="#{mdBuku.gambarSrc}"/></b> (#{mdBuku.tahunTerbitYearOnlyFormatted})
+                                    <br/><br/>
+                                    by #{mdBuku.pengarang}
+                                    <br/>
+                                    #{mdBuku.ratingFormatted} | #{mdBuku.jumlahHalaman} pages
+                                    <br/><br/>
+                                    <p:commandButton value="#{mdBuku.idKategori.nama}" class="diff-action-button" disabled="true" style="width: 70% !important"/>
+                                    <br/><br/>
+                                </p:column>
+                                <p:column style="width: 250px">
+                                    <f:facet name="header">
+                                        <h:outputText value="Details Buku"/>
+                                    </f:facet>
+                                    <p:panelGrid columns="2" styleClass="ui-noborder">
+                                        Stok
+                                        <h:outputText value=": #{mdBuku.stok}"/>
+                                        Harga
+                                        <h:outputText value=": #{mdBuku.hargaFormatted}"/>
+                                    </p:panelGrid>
+                                </p:column>
+                                <p:column style="width: 108px">
+                                    <f:facet name="header">
+                                        <h:outputText value="Action"/>
+                                    </f:facet>
+                                    <p:commandButton action="#{globalBean.setBuku(mdBuku)}" update="@form" process="@this" immediate="true" async="true" class="diff-action-button-icon" icon="pi pi-pencil" style="margin-right: 5px"/>
+                                    <p:commandButton action="#{globalBean.masterDataBuku_delete(mdBuku)}" update="@form messages" immediate="true" async="true" class="diff-action-button-icon" icon="pi pi-trash">
+                                        <p:confirm header="CONFIRMATION" message="Are you sure ?" icon="pi pi-info-circle"/>
+                                    </p:commandButton>
+                                </p:column>
+                            </p:dataTable>
+                        </p:fieldset>
+                    </td>
+                </table>
+                <br/><br/>
+            </p:panel>
+
+            <p:panel rendered="#{globalBean.indexer == 'admin_master_data_kategori_buku'}" style="margin-top: 10px">
+                <h2>MASTER DATA : KATEGORI BUKU</h2>
+            </p:panel>
+
+            <p:panel rendered="#{globalBean.indexer == 'admin_master_data_kategori_buku'}" style="margin-top: 10px">
+                <br/>
+                <table>
+                    <td style="width: 30%" valign="top">
+                        <p:fieldset legend="MANAGE DATA">
+                            <br/>
+                            <p:panelGrid columns="2">
+                                <p:outputLabel value="ID"/>
+                                <p:outputLabel value="#{globalBean.kategori.id == null ? '! New' : globalBean.kategori.idAliiasFormatted}"/>
+                                <p:outputLabel value="Nama Kategori"/>
+                                <p:inputText value="#{globalBean.kategori.nama}" style="width: 95%" required="true" requiredMessage="Nama Required"/>
+                                <p:outputLabel/>
+                                <h:panelGrid columns="2">
+                                    <p:commandButton value="ADD" action="#{globalBean.masterDataKategori_add()}" update="@form messages" icon="pi pi-save" rendered="#{globalBean.kategori.id == null}" class="diff-action-button" style="margin-right: 5px">
+                                        <p:confirm header="CONFIRMATION" message="Are you sure ?" icon="pi pi-info-circle"/>
+                                    </p:commandButton>
+                                    <p:commandButton value="UPDATE" action="#{globalBean.masterDataKategori_update()}" update="@form messages" icon="pi pi-save" rendered="#{globalBean.kategori.id != null}" class="diff-action-button" style="margin-right: 5px">
+                                        <p:confirm header="CONFIRMATION" message="Are you sure ?" icon="pi pi-info-circle"/>
+                                    </p:commandButton>
+                                    <p:commandButton value="REFRESH" action="#{globalBean.redirect_admin_master_data_kategori_buku()}" update="@form" icon="pi pi-refresh" immediate="true" async="true" resetValues="true" class="diff-action-button"/>
+                                </h:panelGrid>
+                            </p:panelGrid>
+                        </p:fieldset>
+                    </td>
+                    <td style="width: 70%" valign="top">
+                        <p:fieldset legend="ALL DATA">
+                            <p:commandButton value="EXPORT" class="diff-action-button" process="@this" immediate="true" async="true" style="margin-bottom: 10px; float: right">
+                                <p:dataExporter type="pdf" target="tkategori_buku" fileName="data_kategori_buku_amigos"/>
+                            </p:commandButton><br/><br/>
+                            <p:dataTable id="tkategori_buku" value="#{globalBean.ejbKategori.allData}" var="mdKategoriBuku">
+                                <p:column style="width: 120px; text-align: center">
+                                    <f:facet name="header">
+                                        <h:outputText value="ID"/>
+                                    </f:facet>
+                                    <h:outputText value="#{mdKategoriBuku.idAliiasFormatted}"/>
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Nama Kategori Buku"/>
+                                    </f:facet>
+                                    <h:outputText value="#{mdKategoriBuku.nama}"/>
+                                </p:column>
+                                <p:column style="width: 108px">
+                                    <f:facet name="header">
+                                        <h:outputText value="Action"/>
+                                    </f:facet>
+                                    <p:commandButton action="#{globalBean.setKategori(mdKategoriBuku)}" update="@form" process="@this" immediate="true" async="true" class="diff-action-button-icon" icon="pi pi-pencil" style="margin-right: 5px"/>
+                                    <p:commandButton action="#{globalBean.masterDataKategori_delete(mdKategoriBuku)}" update="@form messages" immediate="true" async="true" class="diff-action-button-icon" icon="pi pi-trash">
+                                        <p:confirm header="CONFIRMATION" message="Are you sure ?" icon="pi pi-info-circle"/>
+                                    </p:commandButton>
+                                </p:column>
+                            </p:dataTable>
+                        </p:fieldset>
+                    </td>
+                </table>
+                <br/><br/>
+            </p:panel>
+
+            <p:panel rendered="#{globalBean.indexer == 'admin_master_data_anggota'}" style="margin-top: 10px">
+                <h2>MASTER DATA : ANGGOTA</h2>
+            </p:panel>
+
+            <p:panel rendered="#{globalBean.indexer == 'admin_master_data_anggota'}" style="margin-top: 10px">
+                <br/>
+                <p:fieldset legend="ALL DATA">
+                    <p:commandButton value="EXPORT" class="diff-action-button" process="@this" immediate="true" async="true" style="margin-bottom: 10px; float: right">
+                        <p:dataExporter type="pdf" target="tanggota" fileName="data_anggota_amigos"/>
+                    </p:commandButton><br/><br/>
+                    <p:dataTable id="tanggota" value="#{globalBean.ejbAnggota.allData}" var="mdAnggota">
+                        <p:column style="width: 120px; text-align: center">
+                            <f:facet name="header">
+                                <h:outputText value="ID"/>
+                            </f:facet>
+                            <h:outputText value="#{mdAnggota.idAliiasFormatted}"/>
+                        </p:column>
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="Nama Anggota"/>
+                            </f:facet>
+                            <h:outputText value="#{mdAnggota.nama}"/>
+                        </p:column>
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="Kontak"/>
+                            </f:facet>
+                            <h:outputText value="#{mdAnggota.noHp}"/>
+                        </p:column>
+                        <p:column style="width: 170px; text-align: center">
+                            <f:facet name="header">
+                                <h:outputText value="Tanggal Bergabung"/>
+                            </f:facet>
+                            <h:outputText value="#{mdAnggota.tanggalBergabungFormatted}"/>
+                        </p:column>
+                        <p:column style="width: 170px; text-align: center">
+                            <f:facet name="header">
+                                <h:outputText value="Status Akun"/>
+                            </f:facet>
+                            <h:outputText value="ACTIVE" style="color: green" rendered="#{!mdAnggota.isBanned}"/>
+                            <h:outputText value="BANNED" style="color: red" rendered="#{mdAnggota.isBanned}"/>
+                        </p:column>
+                        <p:column style="width: 170px">
+                            <f:facet name="header">
+                                <h:outputText value="Action"/>
+                            </f:facet>
+                            <p:commandButton value="BAN" action="#{globalBean.banAnggota(mdAnggota)}" rendered="#{!mdAnggota.isBanned}" update="@form messages"  immediate="true" async="true" class="diff-action-button-icon" style="width: 100% !important">
+                                <p:confirm header="CONFIRMATION" message="Are you sure ?" icon="pi pi-info-circle"/>
+                            </p:commandButton>
+                            <p:commandButton value="UNBAN" action="#{globalBean.unbanAnggota(mdAnggota)}" rendered="#{mdAnggota.isBanned}" update="@form messages" immediate="true" async="true" class="diff-action-button-icon" style="width: 100% !important">
+                                <p:confirm header="CONFIRMATION" message="Are you sure ?" icon="pi pi-info-circle"/>
+                            </p:commandButton>
+                        </p:column>
+                    </p:dataTable>
+                </p:fieldset>
+                <br/><br/>
+            </p:panel>
+
+            <p:panel rendered="#{globalBean.indexer == 'admin_master_data_admin'}" style="margin-top: 10px">
+                <h2>MASTER DATA : ADMIN</h2>
+            </p:panel>
+
+            <p:panel rendered="#{globalBean.indexer == 'admin_master_data_admin'}" style="margin-top: 10px">
+                <br/>
+                <p:fieldset legend="ALL DATA">
+                    <p:commandButton value="EXPORT" class="diff-action-button" process="@this" immediate="true" async="true" style="margin-bottom: 10px; float: right">
+                        <p:dataExporter type="pdf" target="tadmin" fileName="data_admin_amigos"/>
+                    </p:commandButton><br/><br/>
+                    <p:dataTable id="tadmin" value="#{globalBean.ejbAdminPerpus.allData}" var="mdAdminPerpus">
+                        <p:column style="width: 120px; text-align: center">
+                            <f:facet name="header">
+                                <h:outputText value="ID"/>
+                            </f:facet>
+                            <h:outputText value="#{mdAdminPerpus.idAliiasFormatted}"/>
+                        </p:column>
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="Nama Admin"/>
+                            </f:facet>
+                            <h:outputText value="#{mdAdminPerpus.nama}"/>
+                        </p:column>
+                    </p:dataTable>
+                </p:fieldset>
+                <br/><br/>
+            </p:panel>
+
+            <p:panel rendered="#{globalBean.indexer == 'admin_keuangan'}" style="margin-top: 10px">
+                <h2>KEUANGAN</h2>
+            </p:panel>
+
+            <p:panel rendered="#{globalBean.indexer == 'admin_keuangan'}" style="margin-top: 10px">
+                <br/>
+                <p:dataTable id="tkeuangan" value="#{globalBean.ejbDenda.allData}" var="dad">
+                    <p:column style="width: 140px; text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="ID Denda"/>
+                        </f:facet>
+                        <h:outputText value="#{dad.idAliiasFormatted}"/>
+                    </p:column>
+                    <p:column style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="Keterangan"/>
+                        </f:facet>
+                        <h:outputText value="#{dad.keterangan}"/>
+                    </p:column>
+                    <p:column style="width: 140px; text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="Total Denda"/>
+                        </f:facet>
+                        <h:outputText value="#{dad.totalDendaFormatted}"/>
+                    </p:column>
+                </p:dataTable>
+                <br/>
+                <hr/>
+                <p:panelGrid columns="2" style="width: 100%">
+                    <p:commandButton value="EXPORT" class="diff-action-button" process="@this" immediate="true" async="true">
+                        <p:dataExporter type="pdf" target="tkeuangan" fileName="data_keuangan_amigos"/>
+                    </p:commandButton>
+                    <h3 style="float: right">TOTAL KAS : #{globalBean.totalKas}</h3>
+                </p:panelGrid>
+                <br/><br/>
+            </p:panel>
+
+            <p:panel rendered="#{globalBean.indexer == 'admin_profile'}" style="margin-top: 10px">
+                <h2>PROFILE ADMIN</h2>
+            </p:panel>
+
+            <p:panel rendered="#{globalBean.indexer == 'admin_profile'}" style="margin-top: 10px">
+                <br/>
+                <p:fieldset legend="DETAILS">
+                    <br/>
+                    <p:panelGrid columns="2">
+                        <p:outputLabel value="ID"/>
+                        <p:outputLabel value=": #{globalBean.ejbAdminPerpus.loggedUser.idAliiasFormatted}"/>
+                        <p:outputLabel value="Nama"/>
+                        <p:outputLabel value=": #{globalBean.ejbAdminPerpus.loggedUser.nama}"/>
+                        <p:outputLabel value="Username"/>
+                        <p:outputLabel value=": #{globalBean.ejbAdminPerpus.loggedUser.username}"/>
+                        <p:outputLabel value="Password"/>
+                        <p:outputLabel value=": #{globalBean.ejbAdminPerpus.loggedUser.passwordEncrypted}"/>
+                    </p:panelGrid>
+                </p:fieldset>
+                <br/>
+                <p:fieldset legend="CHANGE PASSWORD">
+                    <br/>
+                    <p:panelGrid columns="2">
+                        <p:outputLabel value="New Password"/>
+                        <p:password value="#{globalBean.anggota.password}" style="width: 98%" maxlength="12" required="true" requiredMessage="New Password Required"/>
+                        <p:outputLabel value="Confirm New Password"/>
+                        <p:password value="#{globalBean.confirmPassword}" style="width: 98%" maxlength="12" required="true" requiredMessage="Confirm New Password Required"/>
+                        <p:outputLabel value="Admin Creation Password"/>
+                        <p:password value="#{globalBean.adminCreationPassword}" style="width: 98%" maxlength="12" required="true" requiredMessage="Admin Creation Password Required"/>
+                        <p:outputLabel/>
+                        <p:commandButton value="SAVE" action="#{globalBean.changePasswordAdmin()}" update="@form messages" icon="pi pi-save" class="diff-action-button" style="width: 102% !important">
+                            <p:confirm header="CONFIRMATION" message="Are you sure ?" icon="pi pi-info-circle"/>
+                        </p:commandButton>
+                    </p:panelGrid>
+                </p:fieldset>
+                <br/><br/>
+            </p:panel>
+
+            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true">
+                <div style="text-align: center">
+                    <p:commandButton value="YES" type="button" styleClass="ui-confirmdialog-yes" style="margin-left: 20px; height: 30px; width: 150px; font-size: 15px"/>
+                    <p:commandButton value="NO" type="button" styleClass="ui-confirmdialog-no ui-button-flat" style="height: 33px; width: 150px; font-size: 15px"/>
+                </div>
+            </p:confirmDialog>
+        </h:form>
+
+        <p:dialog id="dialog_show_book" widgetVar="show_book" resizable="false" draggable="false" width="40%" modal="true" dynamic="true" style="text-align: center">
+            <h:form>
+                <a href="#{globalBean.buku.gambarSrc}" target="blank">
+                    <p:graphicImage alt="invalid url" value="#{globalBean.buku.gambarLink}" style="width: 220px"/>
+                </a><br/>
+                <h2 style="margin-bottom: 0px"><p:link value="#{globalBean.buku.judul}" target="blank" href="#{globalBean.buku.gambarSrc}"/></h2>
+                #{globalBean.buku.pengarang}
+                <br/>
+                <hr style="width: 50%; margin-bottom: 10px"/>
+                #{globalBean.buku.ratingFormatted} | #{globalBean.buku.jumlahHalaman} pages | #{globalBean.buku.tahunTerbitYearOnlyFormatted}
+                <div style="font-size: 13px; margin-top: 5px">##{globalBean.buku.idKategori.nama}</div>
+                <br/>
+                <p:commandButton action="#{globalBean.addToCartPeminjamanBuku()}" value="TAMBAHKAN KE CART PEMINJAMAN" rendered="#{!globalBean.isBookAlreadyInCart() and !globalBean.isBookCartFull() and !globalBean.isBookActivePeminjaman()}" class="diff-action-button" style="width: 50% !important" update="@form :form_global messages" process="@this" immediate="true" async="true" oncomplete="PF('show_book').hide()"/>
+                <p:commandButton value="ALREADY IN CART PEMINJAMAN" disabled="true" rendered="#{globalBean.isBookAlreadyInCart()}" class="diff-action-button" style="width: 50% !important"/>
+                <p:commandButton value="THIS BOOK IS PEMINJAMAN AKTIF" disabled="true" rendered="#{globalBean.isBookActivePeminjaman()}" class="diff-action-button" style="width: 50% !important"/>
+                <p:commandButton value="MAX PEMINJAMAN REACHED" disabled="true" rendered="#{!globalBean.isBookAlreadyInCart() and !globalBean.isBookActivePeminjaman() and globalBean.isBookCartFull()}" class="diff-action-button" style="width: 50% !important"/>
+                <br/><br/><br/>
+            </h:form>
+        </p:dialog>
+    </h:body>
+</html>

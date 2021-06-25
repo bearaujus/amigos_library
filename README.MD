@@ -1,7 +1,14 @@
 # Amigos Library
-Latest Version : [v1.0](https://github.com/bearaujus/amigos_library/releases/tag/v1.0)
+Latest Version : [v2.0](https://github.com/bearaujus/amigos_library/releases/tag/v2.0)
 
 # Latest Changelog
+Release Date : 25/06/2021 `v2.0`
+
+> + Implementing Graph for Kategori Buku & Umur Anggota
+> + Adding Umur Listener
+> + Correcting Front-End Language
+
+# Older Changelog
 Release Date : 20/06/2021 `v1.0`
 
 > + Initial Commit
